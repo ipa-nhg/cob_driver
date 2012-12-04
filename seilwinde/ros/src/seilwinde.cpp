@@ -92,7 +92,7 @@ class NodeClass
 	ros::ServiceServer srvServer_Init_;
 	ros::ServiceServer srvServer_Stop_;
 	ros::ServiceServer srvServer_Recover_;
-	ros::ServiceServer srvServer_SetOperationMode_;
+	//ros::ServiceServer srvServer_SetOperationMode_;
 	ros::ServiceServer srvServer_SetDefaultVel_;
 		
 	// declaration of service clients
@@ -107,7 +107,6 @@ class NodeClass
 	int CanBaudrate_;
 	double MaxVelRadS_;
 	int ModID_;
-	std::string operationMode_;
 	double Offset_;
 	int MotorDirection_;
 	int EnoderIncrementsPerRevMot_;
@@ -155,17 +154,13 @@ class NodeClass
 		if(!n_.hasParam("EnoderIncrementsPerRevMot")) ROS_WARN("Used default parameter for EnoderIncrementsPerRevMot");
 			n_.param<int>("EnoderIncrementsPerRevMot",EnoderIncrementsPerRevMot_, 8000);
 		if(!n_.hasParam("CanDevice")) ROS_WARN("Used default parameter for CanDevice");
-			n_.param<std::string>("CanDevice", CanDevice_, "PCAN");
-		if(!n_.hasParam("CanBaudrate")) ROS_WARN("Used default parameter for CanBaudrate");
-			n_.param<int>("CanBaudrate", CanBaudrate_, 500);
+			n_.param<std::string>("CanDevice", CanDevice_, "/dev/pcan0");
+		if(!n_.hasParam("CanBaudrateVal")) ROS_WARN("Used default parameter for CanBaudrateVal");
+			n_.param<int>("CanBaudrateVal", CanBaudrate_, 0);
 		if(!n_.hasParam("ModId")) ROS_WARN("Used default parameter for ModId");
 			n_.param<int>("ModId",ModID_, 17);
 		if(!n_.hasParam("JointName")) ROS_WARN("Used default parameter for JointName");
-			n_.param<std::string>("JointName",JointName_, "head_axis_joint");
-		if(!n_.hasParam("CanIniFile")) ROS_WARN("Used default parameter for CanIniFile");
-			n_.param<std::string>("CanIniFile",CanIniFile_, "/");
-		if(!n_.hasParam("operation_mode")) ROS_WARN("Used default parameter for operation_mode");
-			n_.param<std::string>("operation_mode",operationMode_, "position");
+			n_.param<std::string>("JointName",JointName_, "seilwinde");
 		if(!n_.hasParam("MotorDirection")) ROS_WARN("Used default parameter for MotorDirection");
 			n_.param<int>("MotorDirection",MotorDirection_, 1);
 		if(!n_.hasParam("GearRatio")) ROS_WARN("Used default parameter for GearRatio");
@@ -178,7 +173,7 @@ class NodeClass
 		ROS_INFO("CanDevice=%s, CanBaudrate=%d, ModID=%d",CanDevice_.c_str(),CanBaudrate_,ModID_);
 
 		//initializing and homing of camera_axis		
-		CamAxisParams_->SetCanIniFile(CanIniFile_);
+		CamAxisParams_->SetCanIniFile(std::string("/"));
 		CamAxisParams_->SetMaxVel(MaxVelRadS_);
 		CamAxisParams_->SetGearRatio(GearRatio_);
 		CamAxisParams_->SetMotorDirection(MotorDirection_);

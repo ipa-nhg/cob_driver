@@ -1,0 +1,14 @@
+#CAN-device parameters
+CanDevice: /dev/pcan0
+CanBaudrateVal: 0
+ModId :17
+#
+#Joint parameters
+JointName: seilwinde
+EnoderIncrementsPerRevMot: 8000
+MotorDirection: 1
+GearRatio: 62.5
+MaxVelRadS: 1
+#
+#Winch specific parameters
+WinchDiameter: 0.10
