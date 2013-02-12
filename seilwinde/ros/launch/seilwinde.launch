@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+	<!-- send parameters to parameter server -->
+	<rosparam command="load" ns="seilwinde" file="$(find seilwinde)/ros/launch/seilwinde.yaml"/>
+
+	<!-- start camera axis -->
+	<node pkg="seilwinde" type="seilwinde_node" name="seilwinde_node" ns="seilwinde" cwd="node" respawn="false" output="screen" />
+
+</launch>
