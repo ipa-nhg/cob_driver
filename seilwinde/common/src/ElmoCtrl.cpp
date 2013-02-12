@@ -350,9 +350,13 @@ bool ElmoCtrl::SetMotionCtrlType(int type)
 	}
 	else if (type == VEL_CTRL)
 	{
-		//UHR: ToDo
-		printf("%s%d:Error: Velocity control not implemented yet!\n",__FILE__,__LINE__);
-		success = false;
+		success = m_Joint->shutdown();
+			if (success)
+					success = m_Joint->setTypeMotion(CanDriveHarmonica::MOTIONTYPE_VELCTRL);
+						
+			//ToDo: necessary?
+			Sleep(100);
+			success = m_Joint->start();
 	}
 	return success;
 };
