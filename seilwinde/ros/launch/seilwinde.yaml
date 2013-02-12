@@ -1,7 +1,7 @@
 #CAN-device parameters
 CanDevice: /dev/pcan0
 CanBaudrateVal: 0
-ModId :17
+ModId: 1
 #
 #Joint parameters
 JointName: seilwinde

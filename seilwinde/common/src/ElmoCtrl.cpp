@@ -198,7 +198,7 @@ bool ElmoCtrl::Init(ElmoCtrlParams * params, bool home) { //home = true by defau
 		}
 		
 		baudrate = params->GetBaudRate();
-		if (baudrate == 0) {	
+		if (baudrate < 0) {	
 			printf("%s,%d:Error: Parameter 'Baud-Rate' not given!\n",__FILE__,__LINE__);
 			success = false;
 		}
@@ -270,7 +270,7 @@ bool ElmoCtrl::Init(ElmoCtrlParams * params, bool home) { //home = true by defau
 							1000000,//80000,//double dAccIncrS2,
 							1000000,//80000//double dDecIncrS2),
 							0, //int iEncOffsetIncr
-							true, // bool bIsSteer
+							false, // bool bIsSteer
 							0, // double dCurrToTorque
 							0, // double dm_HomingDigInCurrMax
 							m_HomingDigIn // int iHomingDigIn //cob3-2->11, cob3-1->9

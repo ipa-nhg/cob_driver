@@ -100,7 +100,7 @@ class NodeClass
 
 	// global variables
 	ElmoCtrl * Seilwinde_;
-	ElmoCtrlParams* CamAxisParams_;
+	ElmoCtrlParams* SeilwindeParams_;
 	
 	std::string CanDevice_;
 	std::string CanIniFile_;
@@ -122,7 +122,7 @@ class NodeClass
 
 	// Constructor
 	NodeClass(std::string name)	{
-		n_ = ros::NodeHandle("~");
+		n_ = ros::NodeHandle("/");
 	
 		isInitialized_ = false;
 		isError_ = false;
@@ -130,7 +130,7 @@ class NodeClass
 		ActualVel_=0.0;
 
 		Seilwinde_ = new ElmoCtrl();
-		CamAxisParams_ = new ElmoCtrlParams();
+		SeilwindeParams_ = new ElmoCtrlParams();
 
 		// implementation of topics to publish
 		topicPub_JointState_ = n_.advertise<sensor_msgs::JointState>("/joint_states", 1);
@@ -158,7 +158,7 @@ class NodeClass
 		if(!n_.hasParam("CanBaudrateVal")) ROS_WARN("Used default parameter for CanBaudrateVal");
 			n_.param<int>("CanBaudrateVal", CanBaudrate_, 0);
 		if(!n_.hasParam("ModId")) ROS_WARN("Used default parameter for ModId");
-			n_.param<int>("ModId",ModID_, 17);
+			n_.param<int>("ModId",ModID_, 1);
 		if(!n_.hasParam("JointName")) ROS_WARN("Used default parameter for JointName");
 			n_.param<std::string>("JointName",JointName_, "seilwinde");
 		if(!n_.hasParam("MotorDirection")) ROS_WARN("Used default parameter for MotorDirection");
@@ -166,29 +166,29 @@ class NodeClass
 		if(!n_.hasParam("GearRatio")) ROS_WARN("Used default parameter for GearRatio");
 			n_.param<double>("GearRatio",GearRatio_, 62.5);
 		if(!n_.hasParam("MaxVelRadS")) ROS_WARN("Used default parameter for MaxVelRadS");
-			n_.param<double>("MaxVelRadS",MaxVelRadS_, 1);
+			n_.param<double>("MaxVelRadS",MaxVelRadS_, 1.0);
 		if(!n_.hasParam("WinchDiameter")) ROS_WARN("Used default parameter for WinchDiameter");
 			n_.param<double>("WinchDiameter",WinchDiameter_, 0.10);
 
 		ROS_INFO("CanDevice=%s, CanBaudrate=%d, ModID=%d",CanDevice_.c_str(),CanBaudrate_,ModID_);
 
 		//initializing and homing of camera_axis		
-		CamAxisParams_->SetCanIniFile(std::string("/"));
-		CamAxisParams_->SetMaxVel(MaxVelRadS_);
-		CamAxisParams_->SetGearRatio(GearRatio_);
-		CamAxisParams_->SetMotorDirection(MotorDirection_);
-		CamAxisParams_->SetEncoderIncrements(EnoderIncrementsPerRevMot_);
+		SeilwindeParams_->SetCanIniFile(std::string("/"));
+		SeilwindeParams_->SetMaxVel(MaxVelRadS_);
+		SeilwindeParams_->SetGearRatio(GearRatio_);
+		SeilwindeParams_->SetMotorDirection(MotorDirection_);
+		SeilwindeParams_->SetEncoderIncrements(EnoderIncrementsPerRevMot_);
 		
 		//not used for velocity only mode
-		CamAxisParams_->SetHomingDir(1);
-		CamAxisParams_->SetHomingDigIn(1);
+		SeilwindeParams_->SetHomingDir(1);
+		SeilwindeParams_->SetHomingDigIn(1);
 		
 		//not used in velocity mode
-		CamAxisParams_->SetUpperLimit(0.0);
-		CamAxisParams_->SetLowerLimit(0.0);
-		CamAxisParams_->SetAngleOffset(0.0);
+		SeilwindeParams_->SetUpperLimit(0.0);
+		SeilwindeParams_->SetLowerLimit(0.0);
+		SeilwindeParams_->SetAngleOffset(0.0);
 	
-		CamAxisParams_->Init(CanDevice_, CanBaudrate_, ModID_);
+		SeilwindeParams_->Init(CanDevice_, CanBaudrate_, ModID_);
 		
 
 	}
@@ -205,28 +205,28 @@ class NodeClass
 				  cob_srvs::Trigger::Response &res )
 	{
 		if (isInitialized_ == false) {
-			ROS_INFO("...initializing camera axis...");
+			ROS_INFO("...initializing seilwinde...");
 			// init powercubes 
-			if (Seilwinde_->Init(CamAxisParams_, false))
+			if (Seilwinde_->Init(SeilwindeParams_, false)) //false here means no home, as we dont need that in velicity mode
 			{
 				Seilwinde_->setGearVelRadS(0.0f);
-				ROS_INFO("Initializing of camera axis succesful");
+				ROS_INFO("Initializing of seilwinde succesful");
 				isInitialized_ = true;
 				res.success.data = true;
-				res.error_message.data = "initializing camera axis successfull";
+				res.error_message.data = "initializing seilwinde successfull";
 			}
 			else
 			{
-				ROS_ERROR("Initializing camera axis not succesful \n");
+				ROS_ERROR("Initializing seilwinde not succesful \n");
 				res.success.data = false;
-				res.error_message.data = "initializing camera axis not successfull";
+				res.error_message.data = "initializing seilwinde not successfull";
 			}
 			}
 			else
 			{
-				ROS_WARN("...camera axis already initialized...");			
+				ROS_WARN("...seilwinde already initialized...");			
 				res.success.data = true;
-				res.error_message.data = "camera axis already initialized";
+				res.error_message.data = "seilwinde already initialized";
 		}
 		
 		return true;
@@ -235,18 +235,18 @@ class NodeClass
 	bool srvCallback_Stop(cob_srvs::Trigger::Request &req,
 				  cob_srvs::Trigger::Response &res )
 	{
-	ROS_INFO("Stopping camera axis");
+	ROS_INFO("Stopping seilwinde");
 	
 	// stopping all arm movements
 	if (Seilwinde_->Stop()) {
-		ROS_INFO("Stopping camera axis successful");
+		ROS_INFO("Stopping seilwinde successful");
 		res.success.data = true;
-		res.error_message.data = "camera axis stopped successfully";
+		res.error_message.data = "seilwinde stopped successfully";
 	}
 	else {
-		ROS_ERROR("Stopping camera axis not succesful. error");
+		ROS_ERROR("Stopping seilwinde not succesful. error");
 		res.success.data = false;
-		res.error_message.data = "stopping camera axis not successful";
+		res.error_message.data = "stopping seilwinde not successful";
 	}
 
 	return true;
@@ -256,22 +256,22 @@ class NodeClass
 				  	 cob_srvs::Trigger::Response &res )
 	{
 		if (isInitialized_ == true) {
-			ROS_INFO("Recovering camera axis");
+			ROS_INFO("Recovering seilwinde");
 			
 			// stopping all arm movements
 			if (Seilwinde_->RecoverAfterEmergencyStop()) {
-				ROS_INFO("Recovering camera axis succesful");
+				ROS_INFO("Recovering seilwinde succesful");
 				res.success.data = true;
-				res.error_message.data = "camera axis successfully recovered";
+				res.error_message.data = "seilwinde successfully recovered";
 			} else {
-				ROS_ERROR("Recovering camera axis not succesful. error");
+				ROS_ERROR("Recovering seilwinde not succesful. error");
 				res.success.data = false;
-				res.error_message.data = "recovering camera axis failed";
+				res.error_message.data = "recovering seilwinde failed";
 			}
 		} else {
-			ROS_WARN("...camera axis already recovered...");			
+			ROS_WARN("...seilwinde already recovered...");			
 			res.success.data = true;
-			res.error_message.data = "camera axis already recovered";
+			res.error_message.data = "seilwinde already recovered";
 		}
 
 		return true;
