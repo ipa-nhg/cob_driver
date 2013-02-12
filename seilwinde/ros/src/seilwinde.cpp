@@ -221,12 +221,12 @@ class NodeClass
 				res.success.data = false;
 				res.error_message.data = "initializing seilwinde not successfull";
 			}
-			}
-			else
-			{
-				ROS_WARN("...seilwinde already initialized...");			
-				res.success.data = true;
-				res.error_message.data = "seilwinde already initialized";
+		}
+		else
+		{
+			ROS_WARN("...seilwinde already initialized...");			
+			res.success.data = true;
+			res.error_message.data = "seilwinde already initialized";
 		}
 		
 		return true;
@@ -235,18 +235,20 @@ class NodeClass
 	bool srvCallback_Stop(cob_srvs::Trigger::Request &req,
 				  cob_srvs::Trigger::Response &res )
 	{
-	ROS_INFO("Stopping seilwinde");
+	if (isInitialized_ == true) {
+		ROS_INFO("Stopping seilwinde");
 	
-	// stopping all arm movements
-	if (Seilwinde_->Stop()) {
-		ROS_INFO("Stopping seilwinde successful");
-		res.success.data = true;
-		res.error_message.data = "seilwinde stopped successfully";
-	}
-	else {
-		ROS_ERROR("Stopping seilwinde not succesful. error");
-		res.success.data = false;
-		res.error_message.data = "stopping seilwinde not successful";
+		// stopping all arm movements
+		if (Seilwinde_->Stop()) {
+			ROS_INFO("Stopping seilwinde successful");
+			res.success.data = true;
+			res.error_message.data = "seilwinde stopped successfully";
+		}
+		else {
+			ROS_ERROR("Stopping seilwinde not succesful. error");
+			res.success.data = false;
+			res.error_message.data = "stopping seilwinde not successful";
+		}
 	}
 
 	return true;
