@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- send cob urdf to param server -->
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(find seilwinde)/ros/urdf/seilwinde.urdf.xacro'" />
+
+	<!-- start robot_state_publisher -->
+	<node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher"/>
+
+	<node name="seilwinde_controller" pkg="seilwinde" type="seilwinde_node" cwd="node" respawn="false" output="screen" >
+		<!--param name="CanIniFile" value="$(find seilwinde)/ros/config/seilwinde.ini" /-->
+		<rosparam command="load" file="$(find seilwinde)/ros/config/seilwinde.yaml"/>
+	</node>
+
+
+</launch>
